@@ -339,10 +339,10 @@ export function validation(
     } else if (val.match(/^--no-.+/)) {
       // check if key/value doesn't exist
       val = val.match(/^--no-(.+)/)[1];
-      val = !argv[val];
+      val = !Object.prototype.hasOwnProperty.call(argv, val);
     } else {
       // check if key/value exists
-      val = argv[val];
+      val = Object.prototype.hasOwnProperty.call(argv, val);
     }
     return val;
   }

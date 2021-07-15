@@ -101,18 +101,34 @@ describe('validation tests', () => {
       failCalled.should.equal(true);
     });
 
+    it("doesn't fail if implied key exists with value 0", () => {
+      yargs('--foo --bar 0')
+        .implies('foo', 'bar')
+        .fail(() => {
+          expect.fail();
+        })
+        .parse();
+    });
+
+    it("doesn't fail if implied key exists with value false", () => {
+      yargs('--foo --bar false')
+        .implies('foo', 'bar')
+        .fail(() => {
+          expect.fail();
+        })
+        .parse();
+    });
+
     it('doesn\'t fail if implied key (with "no" in the name) is set', () => {
-      let failCalled = false;
       const argv = yargs('--bar --noFoo')
         .implies({
           bar: 'noFoo', // --bar means --noFoo (or --no-foo with boolean-negation disabled) is required
           // note that this has nothing to do with --foo
         })
-        .fail(msg => {
-          failCalled = true;
+        .fail(() => {
+          expect.fail();
         })
         .parse();
-      failCalled.should.equal(false);
       expect(argv.bar).to.equal(true);
       expect(argv.noFoo).to.equal(true);
       expect(argv.foo).to.equal(undefined);
@@ -134,17 +150,15 @@ describe('validation tests', () => {
     });
 
     it('doesn\'t fail if implied key (with "no" in the name) that should not be given is not set', () => {
-      let failCalled = false;
       const argv = yargs('--bar')
         .implies({
           bar: '--no-noFoo', // --bar means --noFoo (or --no-foo with boolean-negation disabled) cannot be given
           // note that this has nothing to do with --foo
         })
-        .fail(msg => {
-          failCalled = true;
+        .fail(() => {
+          expect.fail();
         })
         .parse();
-      failCalled.should.equal(false);
       expect(argv.bar).to.equal(true);
       expect(argv.noFoo).to.equal(undefined);
       expect(argv.foo).to.equal(undefined);
