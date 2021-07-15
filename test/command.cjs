@@ -1547,6 +1547,35 @@ describe('Command', () => {
             return done();
           });
       });
+
+      // addresses https://github.com/yargs/yargs/issues/1966
+      it('should not be applied multiple times for nested commands', () => {
+        let coerceExecutionCount = 0;
+
+        const argv = yargs('cmd1 cmd2 foo bar baz')
+          .command('cmd1', 'cmd1 desc', yargs =>
+            yargs.command('cmd2 <positional1> <rest...>', 'cmd2 desc', yargs =>
+              yargs
+                .positional('rest', {
+                  type: 'string',
+                  coerce: arg => {
+                    if (coerceExecutionCount) {
+                      throw Error('coerce applied multiple times');
+                    }
+                    coerceExecutionCount++;
+                    return arg.join(' ');
+                  },
+                })
+                .fail(() => {
+                  expect.fail();
+                })
+            )
+          )
+          .parse();
+
+        argv.rest.should.equal('bar baz');
+        coerceExecutionCount.should.equal(1);
+      });
     });
 
     describe('defaults', () => {

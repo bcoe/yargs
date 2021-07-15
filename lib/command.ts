@@ -224,29 +224,27 @@ export class CommandInstance {
       helpOnly,
       helpOrVersionSet
     );
-    if (isPromise(builderResult)) {
-      return builderResult.then(result => {
-        return this.applyMiddlewareAndGetResult(
+    return isPromise(builderResult)
+      ? builderResult.then(result =>
+          this.applyMiddlewareAndGetResult(
+            isDefaultCommand,
+            commandHandler,
+            result.innerArgv,
+            currentContext,
+            helpOnly,
+            result.aliases,
+            yargs
+          )
+        )
+      : this.applyMiddlewareAndGetResult(
           isDefaultCommand,
           commandHandler,
-          result.innerArgv,
+          builderResult.innerArgv,
           currentContext,
           helpOnly,
-          result.aliases,
+          builderResult.aliases,
           yargs
         );
-      });
-    } else {
-      return this.applyMiddlewareAndGetResult(
-        isDefaultCommand,
-        commandHandler,
-        builderResult.innerArgv,
-        currentContext,
-        helpOnly,
-        builderResult.aliases,
-        yargs
-      );
-    }
   }
   private applyBuilderUpdateUsageAndParse(
     isDefaultCommand: boolean,

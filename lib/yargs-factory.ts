@@ -1156,11 +1156,10 @@ export class YargsInstance {
       'alias',
     ];
     opts = objFilter(opts, (k, v) => {
-      let accept = supportedOpts.indexOf(k) !== -1;
       // type can be one of string|number|boolean.
-      if (k === 'type' && ['string', 'number', 'boolean'].indexOf(v) === -1)
-        accept = false;
-      return accept;
+      if (k === 'type' && !['string', 'number', 'boolean'].includes(v))
+        return false;
+      return supportedOpts.includes(k);
     });
 
     // copy over any settings that can be inferred from the command string.

@@ -12,10 +12,11 @@ export class GlobalMiddleware {
   addMiddleware(
     callback: MiddlewareCallback | MiddlewareCallback[],
     applyBeforeValidation: boolean,
-    global = true
+    global = true,
+    mutates = false
   ): YargsInstance {
     argsert(
-      '<array|function> [boolean] [boolean]',
+      '<array|function> [boolean] [boolean] [boolean]',
       [callback, applyBeforeValidation, global],
       arguments.length
     );
@@ -36,6 +37,7 @@ export class GlobalMiddleware {
       const m = callback as Middleware;
       m.applyBeforeValidation = applyBeforeValidation;
       m.global = global;
+      m.mutates = mutates;
       this.globalMiddleware.push(callback as Middleware);
     }
     return this.yargs;
@@ -53,7 +55,7 @@ export class GlobalMiddleware {
       else return !toCheck.includes(m.option);
     });
     (callback as Middleware).option = option;
-    return this.addMiddleware(callback, true, true);
+    return this.addMiddleware(callback, true, true, true);
   }
   getMiddleware() {
     return this.globalMiddleware;
@@ -92,6 +94,11 @@ export function applyMiddleware(
         return acc;
       }
 
+      if (middleware.mutates) {
+        if (middleware.applied) return acc;
+        middleware.applied = true;
+      }
+
       if (isPromise(acc)) {
         return acc
           .then(initialObj =>
@@ -124,4 +131,6 @@ export interface Middleware extends MiddlewareCallback {
   applyBeforeValidation: boolean;
   global: boolean;
   option?: string;
+  mutates?: boolean;
+  applied?: boolean;
 }
