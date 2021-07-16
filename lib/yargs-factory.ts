@@ -904,6 +904,21 @@ export class YargsInstance {
         opt = {};
       }
 
+      // Prevent version name collision
+      // Addresses: https://github.com/yargs/yargs/issues/1979
+      if (this.#versionOpt && (key === 'version' || opt?.alias === 'version')) {
+        throw new YError(
+          [
+            '"version" is a reserved word.',
+            'Please do one of the following:',
+            '- Disable version with `yargs.version(false)` if using "version" as an option',
+            '- Use the built-in `yargs.version` method instead (if applicable)',
+            '- Use a different option key',
+            'https://yargs.js.org/docs/#api-reference-version',
+          ].join('\n')
+        );
+      }
+
       this.#options.key[key] = true; // track manually set keys.
 
       if (opt.alias) this.alias(key, opt.alias);
