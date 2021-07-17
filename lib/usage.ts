@@ -206,7 +206,7 @@ export function usage(yargs: YargsInstance, shim: PlatformShim) {
       if (usages.length) {
         // user-defined usage.
         usages.forEach(usage => {
-          ui.div(`${usage[0].replace(/\$0/g, base$0)}`);
+          ui.div({text: `${usage[0].replace(/\$0/g, base$0)}`});
           if (usage[1]) {
             ui.div({text: `${usage[1]}`, padding: [1, 0, 0, 0]});
           }
